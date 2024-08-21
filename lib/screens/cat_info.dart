@@ -1,5 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+
 import '../api/cats_api.dart';
+import '../components/cat_image_widget.dart';
+import '../model/cats.dart';
 
 class CatInfo extends StatefulWidget {
   final String catBreed;
@@ -12,27 +17,44 @@ class CatInfo extends StatefulWidget {
 }
 
 class _CatInfoState extends State<CatInfo> {
+  CatList catList = CatList(breeds: List.empty());
+
+  void getCatSpecificData() async {
+    final catJson = await CatAPI().getCatBreed(widget.catId);
+
+    final dynamic catMap = json.decode(catJson);
+
+    setState(() {
+      catList = CatList.fromJson(catMap);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    getCatSpecificData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.catBreed),
-        ),
-        body: getCat());
+      appBar: AppBar(
+        title: Text(widget.catBreed),
+      ),
+      body: getCat(),
+    );
   }
 
   Widget getCat() {
-    final mediaSize = MediaQuery.of(context).size;
-    return Center(
-      child: SizedBox(
-        width: mediaSize.width,
-        height: mediaSize.height,
-      ),
-    );
+    if (catList.breeds.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    } else {
+      return Center(
+        child: CatImage(
+          imageUrl: catList.breeds[0].url,
+          breed: widget.catBreed,
+        ),
+      );
+    }
   }
 }

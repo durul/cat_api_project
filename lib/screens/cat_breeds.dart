@@ -51,7 +51,8 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
               onTap: () {
                 Navigator.push<void>(context,
                     MaterialPageRoute(builder: (context) {
-                  return const CatInfo(catId: 'id', catBreed: 'Name');
+                  return CatInfo(catId: breedList.breeds[index].id,
+                      catBreed: breedList.breeds[index].name);
                 }));
               },
               child: Card(

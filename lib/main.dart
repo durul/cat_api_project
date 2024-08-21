@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'screens/cat_breeds.dart';
 
@@ -13,6 +14,11 @@ class MyApp extends StatelessWidget {
       title: 'Cats',
       theme: ThemeData(
         primarySwatch: Colors.orange,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+          systemOverlayStyle: SystemUiOverlayStyle.light,
+        ),
       ),
       home: const CatBreedsPage(title: 'Cat Breeds'),
     );
