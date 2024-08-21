@@ -1,5 +1,10 @@
 import 'package:json_annotation/json_annotation.dart';
+
 part 'cats.g.dart';
+
+// tryCast is a simple method that tries to cast an object into a given type, and if it’s unsuccessful, it returns null.
+T? tryCast<T>(dynamic object) => object is T ? object : null;
+
 
 // json_annotation library to parse the JSON data into objects of my model classes.
 // The part statement imports a file and allows me to use its private variables.
@@ -68,10 +73,21 @@ class CatBreed {
       required this.width,
       required this.height});
 
-  factory CatBreed.fromJson(Map<String, dynamic> json) =>
-      _$CatBreedFromJson(json);
+  // factory CatBreed.fromJson(Map<String, dynamic> json) =>
+  //     _$CatBreedFromJson(json);
 
   Map<String, dynamic> toJson() => _$CatBreedToJson(this);
+
+  // Error Handling
+  factory CatBreed.fromJson(Map<String, dynamic> json) {
+    return CatBreed(
+      id: tryCast<String>(json['id']) ?? '',
+      url: tryCast<String>(json['url']) ?? '',
+      width: tryCast<int>(json['width']) ?? 0,
+      height: tryCast<int>(json['height']) ?? 0,
+    );
+  }
+
 }
 
 @JsonSerializable()

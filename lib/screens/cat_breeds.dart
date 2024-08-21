@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../api/cats_api.dart';
+import '../model/cats.dart';
 import 'cat_info.dart';
 
 class CatBreedsPage extends StatefulWidget {
@@ -13,10 +16,20 @@ class CatBreedsPage extends StatefulWidget {
 }
 
 class _CatBreedsPageState extends State<CatBreedsPage> {
+  BreedList breedList = BreedList(breeds: List.empty());
+
   // This method calls the Cat API to get the cat breeds.
   void getCatData() async {
     final catJson = await CatAPI().getCatBreeds();
-    print(catJson);
+    // print(catJson);
+
+    //  turn the JSON string into a map.
+    final dynamic catMap = json.decode(catJson);
+
+    setState(() {
+      // to convert the map into a list of breeds.
+      breedList = BreedList.fromJson(catMap);
+    });
   }
 
   @override
@@ -32,7 +45,7 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
         title: Text(widget.title),
       ),
       body: ListView.builder(
-          itemCount: 0,
+          itemCount: breedList.breeds.length,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
@@ -41,13 +54,12 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
                   return const CatInfo(catId: 'id', catBreed: 'Name');
                 }));
               },
-              child: const Card(
+              child: Card(
                 child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  // 7
+                  padding: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text('Breed Name'),
-                    subtitle: Text('Breed Description'),
+                    title: Text(breedList.breeds[index].name),
+                    subtitle: Text(breedList.breeds[index].description),
                   ),
                 ),
               ),
