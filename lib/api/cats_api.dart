@@ -1,23 +1,31 @@
+import '../model/cats.dart';
 import 'network.dart';
 
-const String apiKey =
-    'live_vs9El4qaLPFml0kQ3aTvGGVsVjbg8Bb32bBLGLTkp5pQOwUEDeE0dW41CgJKUNl8';
-const String catAPIURL = 'https://api.thecatapi.com/v1/breeds?';
-const String catImageAPIURL = 'https://api.thecatapi.com/v1/images/search?';
-const String breedString = 'breed_id=';
-const String apiKeyString = 'x-api-key=$apiKey';
+const String _baseUrl = 'https://api.thecatapi.com/v1';
+const String _breedsEndpoint = '/breeds';
+const String _imagesEndpoint = '/images/search';
 
+typedef CatResponse = List<Breed>;
+typedef CatDetailsResponse = CatBreed;
+
+// CatAPI class now uses dependency injection for the HTTP client.
 class CatAPI {
-  Future<String> getCatBreeds() async {
-    final network = Network('$catAPIURL$apiKeyString');
-    final catData = await network.getData();
-    return catData;
+  final network = Network();
+
+  Future<CatResponse> getCatBreeds() async {
+    final uri = Uri.parse('$_baseUrl$_breedsEndpoint');
+    return network.makeRequest<CatResponse>(
+      uri,
+      (json) => BreedList.fromJson(json).breeds,
+    );
   }
 
-  Future<String> getCatBreed(String breedName) async {
-    final network =
-        Network('$catImageAPIURL$breedString$breedName&$apiKeyString');
-    final catData = await network.getData();
-    return catData;
+  Future<List<CatDetailsResponse>> getCatBreed(String breedId) async {
+    final uri = Uri.parse('$_baseUrl$_imagesEndpoint')
+        .replace(queryParameters: {'breed_id': breedId});
+    return network.makeRequest<List<CatDetailsResponse>>(
+      uri,
+      (json) => CatList.fromJson(json).breeds,
+    );
   }
 }

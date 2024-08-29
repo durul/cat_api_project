@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-
 import '../api/cats_api.dart';
 import '../components/cat_image_widget.dart';
 import '../model/cats.dart';
@@ -10,23 +7,32 @@ class CatInfo extends StatefulWidget {
   final String catBreed;
   final String catId;
 
-  const CatInfo({super.key, required this.catBreed, required this.catId});
+  const CatInfo({Key? key, required this.catBreed, required this.catId}) : super(key: key);
 
   @override
   State<CatInfo> createState() => _CatInfoState();
 }
 
 class _CatInfoState extends State<CatInfo> {
-  CatList catList = CatList(breeds: List.empty());
+  List<CatBreed> catBreeds = [];
+  bool isLoading = true;
+  String? error;
 
   void getCatSpecificData() async {
-    final catJson = await CatAPI().getCatBreed(widget.catId);
+    try {
+      final catBreedResponse = await CatAPI().getCatBreed(widget.catId);
 
-    final dynamic catMap = json.decode(catJson);
-
-    setState(() {
-      catList = CatList.fromJson(catMap);
-    });
+      setState(() {
+        catBreeds = catBreedResponse;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        error = 'Error fetching cat breed data: $e';
+        isLoading = false;
+      });
+      print(error);
+    }
   }
 
   @override
@@ -41,19 +47,37 @@ class _CatInfoState extends State<CatInfo> {
       appBar: AppBar(
         title: Text(widget.catBreed),
       ),
-      body: getCat(),
+      body: _buildBody(),
     );
   }
 
-  Widget getCat() {
-    if (catList.breeds.isEmpty) {
+  Widget _buildBody() {
+    if (isLoading) {
       return const Center(child: CircularProgressIndicator());
+    } else if (error != null) {
+      return Center(child: Text(error!));
+    } else if (catBreeds.isEmpty) {
+      return const Center(child: Text('No images found for this breed.'));
     } else {
-      return Center(
-        child: CatImage(
-          imageUrl: catList.breeds[0].url,
-          breed: widget.catBreed,
-        ),
+      return ListView.builder(
+        itemCount: catBreeds.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                CatImage(
+                  imageUrl: catBreeds[index].url,
+                  breed: widget.catBreed,
+                ),
+                ListTile(
+                  title: Text('Image ID: ${catBreeds[index].id}'),
+                  subtitle: Text('Size: ${catBreeds[index].width}x${catBreeds[index].height}'),
+                ),
+              ],
+            ),
+          );
+        },
       );
     }
   }

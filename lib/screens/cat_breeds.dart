@@ -16,20 +16,20 @@ class CatBreedsPage extends StatefulWidget {
 }
 
 class _CatBreedsPageState extends State<CatBreedsPage> {
-  BreedList breedList = BreedList(breeds: List.empty());
+  List<Breed> breeds = [];
 
   // This method calls the Cat API to get the cat breeds.
   void getCatData() async {
-    final catJson = await CatAPI().getCatBreeds();
-    // print(catJson);
+    try {
+      final catResponse = await CatAPI().getCatBreeds();
 
-    //  turn the JSON string into a map.
-    final dynamic catMap = json.decode(catJson);
-
-    setState(() {
-      // to convert the map into a list of breeds.
-      breedList = BreedList.fromJson(catMap);
-    });
+      setState(() {
+        breeds = catResponse;
+      });
+    } catch (e) {
+      print('Error fetching cat breeds: $e');
+      // Handle the error appropriately, maybe show a snackbar or dialog to the user
+    }
   }
 
   @override
@@ -45,22 +45,22 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
         title: Text(widget.title),
       ),
       body: ListView.builder(
-          itemCount: breedList.breeds.length,
+          itemCount: breeds.length,
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () {
                 Navigator.push<void>(context,
                     MaterialPageRoute(builder: (context) {
-                  return CatInfo(catId: breedList.breeds[index].id,
-                      catBreed: breedList.breeds[index].name);
+                  return CatInfo(catId: breeds[index].id,
+                      catBreed: breeds[index].name);
                 }));
               },
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text(breedList.breeds[index].name),
-                    subtitle: Text(breedList.breeds[index].description),
+                    title: Text(breeds[index].name),
+                    subtitle: Text(breeds[index].description),
                   ),
                 ),
               ),

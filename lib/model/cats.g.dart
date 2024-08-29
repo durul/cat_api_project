@@ -20,16 +20,6 @@ Map<String, dynamic> _$BreedToJson(Breed instance) => <String, dynamic>{
       'temperament': instance.temperament,
     };
 
-BreedList _$BreedListFromJson(Map<String, dynamic> json) => BreedList(
-      breeds: (json['breeds'] as List<dynamic>)
-          .map((e) => Breed.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$BreedListToJson(BreedList instance) => <String, dynamic>{
-      'breeds': instance.breeds,
-    };
-
 Cat _$CatFromJson(Map<String, dynamic> json) => Cat(
       name: json['name'] as String,
       description: json['description'] as String,
@@ -54,14 +44,4 @@ Map<String, dynamic> _$CatBreedToJson(CatBreed instance) => <String, dynamic>{
       'url': instance.url,
       'width': instance.width,
       'height': instance.height,
-    };
-
-CatList _$CatListFromJson(Map<String, dynamic> json) => CatList(
-      breeds: (json['breeds'] as List<dynamic>)
-          .map((e) => CatBreed.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$CatListToJson(CatList instance) => <String, dynamic>{
-      'breeds': instance.breeds,
     };
