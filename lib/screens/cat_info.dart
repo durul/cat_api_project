@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../api/cats_api.dart';
 import '../components/cat_image_widget.dart';
 import '../model/cats.dart';
@@ -7,38 +8,40 @@ class CatInfo extends StatefulWidget {
   final String catBreed;
   final String catId;
 
-  const CatInfo({Key? key, required this.catBreed, required this.catId}) : super(key: key);
+  const CatInfo({super.key, required this.catBreed, required this.catId});
 
   @override
   State<CatInfo> createState() => _CatInfoState();
 }
 
 class _CatInfoState extends State<CatInfo> {
-  List<CatBreed> catBreeds = [];
+  final CatAPI catAPI = CatAPI();
+  CatBreed? catBreed;
   bool isLoading = true;
   String? error;
-
-  void getCatSpecificData() async {
-    try {
-      final catBreedResponse = await CatAPI().getCatBreed(widget.catId);
-
-      setState(() {
-        catBreeds = catBreedResponse;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        error = 'Error fetching cat breed data: $e';
-        isLoading = false;
-      });
-      print(error);
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     getCatSpecificData();
+  }
+
+  Future<void> getCatSpecificData() async {
+    setState(() {
+      isLoading = true;
+      error = null;
+    });
+
+    final catBreedResponse = await catAPI.getCatBreed(widget.catId);
+
+    setState(() {
+      if (catBreedResponse.isSuccess && catBreedResponse.data != null) {
+        catBreed = catBreedResponse.data;
+      } else {
+        error = catBreedResponse.error ?? 'An unknown error occurred';
+      }
+      isLoading = false;
+    });
   }
 
   @override
@@ -47,38 +50,32 @@ class _CatInfoState extends State<CatInfo> {
       appBar: AppBar(
         title: Text(widget.catBreed),
       ),
-      body: _buildBody(),
+      body: getCatContent(),
     );
   }
 
-  Widget _buildBody() {
+  Widget getCatContent() {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     } else if (error != null) {
-      return Center(child: Text(error!));
-    } else if (catBreeds.isEmpty) {
-      return const Center(child: Text('No images found for this breed.'));
-    } else {
-      return ListView.builder(
-        itemCount: catBreeds.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                CatImage(
-                  imageUrl: catBreeds[index].url,
-                  breed: widget.catBreed,
-                ),
-                ListTile(
-                  title: Text('Image ID: ${catBreeds[index].id}'),
-                  subtitle: Text('Size: ${catBreeds[index].width}x${catBreeds[index].height}'),
-                ),
-              ],
-            ),
-          );
-        },
+      return Center(
+          child: Text(error!, style: const TextStyle(color: Colors.red)));
+    } else if (catBreed != null) {
+      return Card(
+        margin: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            CatImage(imageUrl: catBreed!.url, breed: widget.catBreed),
+            const SizedBox(height: 10),
+            Text('Height: ${catBreed!.height}'),
+            const SizedBox(height: 10),
+            Text('Width: ${catBreed!.width}'),
+            const SizedBox(height: 10),
+          ],
+        ),
       );
+    } else {
+      return const Center(child: Text('No data available'));
     }
   }
 }

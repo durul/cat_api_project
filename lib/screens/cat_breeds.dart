@@ -17,18 +17,27 @@ class CatBreedsPage extends StatefulWidget {
 
 class _CatBreedsPageState extends State<CatBreedsPage> {
   List<Breed> breeds = [];
+  String? errorMessage;
 
-  // This method calls the Cat API to get the cat breeds.
-  void getCatData() async {
-    try {
-      final catResponse = await CatAPI().getCatBreeds();
+  final CatAPI catAPI = CatAPI();
 
+  Future<void> getCatData() async {
+    setState(() {
+      errorMessage = null; // Clear any previous error
+    });
+
+    final catResponse = await catAPI.getCatBreeds();
+
+    if (catResponse.isSuccess && catResponse.data != null) {
       setState(() {
-        breeds = catResponse;
+        breeds = catResponse.data!;
       });
-    } catch (e) {
-      print('Error fetching cat breeds: $e');
-      // Handle the error appropriately, maybe show a snackbar or dialog to the user
+    } else {
+      setState(() {
+        errorMessage = catResponse.error ?? 'An unknown error occurred';
+        print('Error fetching cat breeds: $errorMessage');
+      });
+      // You might want to show a SnackBar or Dialog here to inform the user
     }
   }
 
