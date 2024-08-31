@@ -44,7 +44,7 @@ class BreedList {
             json.map((e) => Breed.fromJson(e as Map<String, dynamic>)).toList(),
       );
     } else {
-      throw FormatException('Unexpected JSON structure for BreedList');
+      throw const FormatException('Unexpected JSON structure for BreedList');
     }
   }
 }
@@ -102,7 +102,7 @@ class CatList {
             .toList(),
       );
     } else {
-      throw FormatException('Unexpected JSON structure for CatList');
+      throw const FormatException('Unexpected JSON structure for CatList');
     }
   }
 }

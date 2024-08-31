@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../api/cats_api.dart';
@@ -18,33 +16,41 @@ class CatBreedsPage extends StatefulWidget {
 class _CatBreedsPageState extends State<CatBreedsPage> {
   List<Breed> breeds = [];
   String? errorMessage;
+  bool isLoading = false;
 
   final CatAPI catAPI = CatAPI();
-
-  Future<void> getCatData() async {
-    setState(() {
-      errorMessage = null; // Clear any previous error
-    });
-
-    final catResponse = await catAPI.getCatBreeds();
-
-    if (catResponse.isSuccess && catResponse.data != null) {
-      setState(() {
-        breeds = catResponse.data!;
-      });
-    } else {
-      setState(() {
-        errorMessage = catResponse.error ?? 'An unknown error occurred';
-        print('Error fetching cat breeds: $errorMessage');
-      });
-      // You might want to show a SnackBar or Dialog here to inform the user
-    }
-  }
 
   @override
   void initState() {
     super.initState();
     getCatData();
+  }
+
+  Future<void> getCatData() async {
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
+    try {
+      final catResponse = await catAPI.getCatBreeds();
+      if (catResponse.isSuccess && catResponse.data != null) {
+        setState(() {
+          breeds = catResponse.data!;
+        });
+      } else {
+        throw Exception(catResponse.error ?? 'An unknown error occurred');
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = e.toString();
+        print('Error fetching cat breeds: $errorMessage');
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -53,28 +59,94 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ListView.builder(
-          itemCount: breeds.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Navigator.push<void>(context,
-                    MaterialPageRoute(builder: (context) {
-                  return CatInfo(catId: breeds[index].id,
-                      catBreed: breeds[index].name);
-                }));
-              },
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(breeds[index].name),
-                    subtitle: Text(breeds[index].description),
-                  ),
-                ),
+      body: RefreshIndicator(
+        onRefresh: getCatData,
+        child: _buildBody(),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (isLoading) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Loading cat breeds...'),
+          ],
+        ),
+      );
+    } else if (errorMessage != null) {
+      return Padding(
+        padding: const EdgeInsets.all(30.0),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: getCatData,
+                child: const Text('Retry'),
               ),
-            );
-          }),
+            ],
+          ),
+        ),
+      );
+    } else if (breeds.isEmpty) {
+      return const Center(child: Text('No cat breeds available'));
+    } else {
+      return ListView.builder(
+        itemCount: breeds.length,
+        itemBuilder: (context, index) {
+          return _buildBreedCard(breeds[index]);
+        },
+      );
+    }
+  }
+
+  Widget _buildBreedCard(Breed breed) {
+    return Semantics(
+      label: 'Cat breed: ${breed.name}',
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: InkWell(
+          onTap: () => _navigateToCatInfo(breed),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  breed.name,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  breed.description,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToCatInfo(Breed breed) {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CatInfo(
+          catId: breed.id,
+          catBreed: breed.name,
+        ),
+      ),
     );
   }
 }

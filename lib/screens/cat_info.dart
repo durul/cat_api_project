@@ -56,22 +56,43 @@ class _CatInfoState extends State<CatInfo> {
 
   Widget getCatContent() {
     if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text('Loading cat information...'),
+          ],
+        ),
+      );
     } else if (error != null) {
       return Center(
-          child: Text(error!, style: const TextStyle(color: Colors.red)));
-    } else if (catBreed != null) {
-      return Card(
-        margin: const EdgeInsets.all(8.0),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            CatImage(imageUrl: catBreed!.url, breed: widget.catBreed),
-            const SizedBox(height: 10),
-            Text('Height: ${catBreed!.height}'),
-            const SizedBox(height: 10),
-            Text('Width: ${catBreed!.width}'),
-            const SizedBox(height: 10),
+            Text(error!, style: const TextStyle(color: Colors.red)),
+            ElevatedButton(
+              onPressed: getCatSpecificData,
+              child: const Text('Retry'),
+            ),
           ],
+        ),
+      );
+    } else if (catBreed != null) {
+      return SingleChildScrollView(
+        child: Card(
+          margin: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              CatImage(imageUrl: catBreed!.url, breed: widget.catBreed),
+              const SizedBox(height: 10),
+              Text('Height: ${catBreed?.height ?? 'Unknown'}'),
+              const SizedBox(height: 10),
+              Text('Width: ${catBreed?.width ?? 'Unknown'}'),
+              const SizedBox(height: 10),
+            ],
+          ),
         ),
       );
     } else {
