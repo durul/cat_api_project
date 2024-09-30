@@ -66,6 +66,7 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
     );
   }
 
+  /// This method will build the body of the page based on the state of the app.
   Widget _buildBody() {
     if (isLoading) {
       return const Center(
@@ -85,7 +86,11 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(errorMessage!, style: const TextStyle(color: Colors.red)),
+              Text(errorMessage!,
+                  style: const TextStyle(
+                    color: Colors.red,
+                    fontFamily: 'NotoSansSymbols',
+                  )),
               const SizedBox(height: 25),
               ElevatedButton(
                 onPressed: getCatData,
@@ -127,7 +132,7 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
                 Text(
                   breed.description,
                   style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],

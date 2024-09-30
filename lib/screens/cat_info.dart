@@ -85,7 +85,7 @@ class _CatInfoState extends State<CatInfo> {
           margin: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              CatImage(imageUrl: catBreed!.url, breed: widget.catBreed),
+              buildCatImage(),
               const SizedBox(height: 10),
               Text('Height: ${catBreed?.height ?? 'Unknown'}'),
               const SizedBox(height: 10),
@@ -98,5 +98,9 @@ class _CatInfoState extends State<CatInfo> {
     } else {
       return const Center(child: Text('No data available'));
     }
+  }
+
+  Widget buildCatImage() {
+    return CatImage(imageUrl: catBreed!.url, breed: widget.catBreed);
   }
 }

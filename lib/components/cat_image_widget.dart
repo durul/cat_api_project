@@ -18,11 +18,31 @@ class CatImage extends StatelessWidget {
       children: [
         CachedNetworkImage(
           imageUrl: imageUrl,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => const CircularProgressIndicator(),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
+          placeholder: (context, url) => CircularProgressIndicator(),
+          errorWidget: (context, url, error) {
+            print('Error loading image: $error');
+            return Column(
+              children: [
+                Icon(Icons.error, color: Colors.red, size: 50),
+                SizedBox(height: 10),
+                Text('Failed to load image',
+                    style: TextStyle(color: Colors.red,
+                    fontFamily: 'NotoSansSymbols',)),
+              ],
+            );
+          },
+          imageBuilder: (context, imageProvider) => Container(
+            height: 200,
+            width: 200,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: imageProvider,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Text(
           breed,
           style: Theme.of(context).textTheme.titleLarge,
