@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../api/cats_api.dart';
 import '../components/cat_image_widget.dart';
 import '../model/cats.dart';
+import '../provider/cat_data_provider.dart';
 
 class CatInfo extends StatefulWidget {
   final String catBreed;
@@ -15,32 +16,11 @@ class CatInfo extends StatefulWidget {
 }
 
 class _CatInfoState extends State<CatInfo> {
-  final CatAPI catAPI = CatAPI();
-  CatBreed? catBreed;
-  bool isLoading = true;
-  String? error;
-
   @override
   void initState() {
     super.initState();
-    getCatSpecificData();
-  }
-
-  Future<void> getCatSpecificData() async {
-    setState(() {
-      isLoading = true;
-      error = null;
-    });
-
-    final catBreedResponse = await catAPI.getCatBreed(widget.catId);
-
-    setState(() {
-      if (catBreedResponse.isSuccess && catBreedResponse.data != null) {
-        catBreed = catBreedResponse.data;
-      } else {
-        error = catBreedResponse.error ?? 'An unknown error occurred';
-      }
-      isLoading = false;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<CatDataProvider>().getCatSpecificData(widget.catId);
     });
   }
 
@@ -50,12 +30,16 @@ class _CatInfoState extends State<CatInfo> {
       appBar: AppBar(
         title: Text(widget.catBreed),
       ),
-      body: getCatContent(),
+      body: Consumer<CatDataProvider>(
+        builder: (context, catDataProvider, child) {
+          return getCatContent(catDataProvider);
+        },
+      ),
     );
   }
 
-  Widget getCatContent() {
-    if (isLoading) {
+  Widget getCatContent(CatDataProvider catDataProvider) {
+    if (catDataProvider.isLoading) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -66,30 +50,31 @@ class _CatInfoState extends State<CatInfo> {
           ],
         ),
       );
-    } else if (error != null) {
+    } else if (catDataProvider.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(error!, style: const TextStyle(color: Colors.red)),
+            Text(catDataProvider.errorMessage!,
+                style: const TextStyle(color: Colors.red)),
             ElevatedButton(
-              onPressed: getCatSpecificData,
+              onPressed: () => catDataProvider.getCatSpecificData(widget.catId),
               child: const Text('Retry'),
             ),
           ],
         ),
       );
-    } else if (catBreed != null) {
+    } else if (catDataProvider.catBreed != null) {
       return SingleChildScrollView(
         child: Card(
           margin: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              buildCatImage(),
+              buildCatImage(catDataProvider.catBreed!),
               const SizedBox(height: 10),
-              Text('Height: ${catBreed?.height ?? 'Unknown'}'),
+              Text('Height: ${catDataProvider.catBreed?.height ?? 'Unknown'}'),
               const SizedBox(height: 10),
-              Text('Width: ${catBreed?.width ?? 'Unknown'}'),
+              Text('Width: ${catDataProvider.catBreed?.width ?? 'Unknown'}'),
               const SizedBox(height: 10),
             ],
           ),
@@ -100,7 +85,7 @@ class _CatInfoState extends State<CatInfo> {
     }
   }
 
-  Widget buildCatImage() {
-    return CatImage(imageUrl: catBreed!.url, breed: widget.catBreed);
+  Widget buildCatImage(CatBreed catBreed) {
+    return CatImage(imageUrl: catBreed.url, breed: widget.catBreed);
   }
 }

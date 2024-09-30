@@ -5,8 +5,10 @@ import 'package:http/http.dart';
 const String _apiKey =
     'live_vs9El4qaLPFml0kQ3aTvGGVsVjbg8Bb32bBLGLTkp5pQOwUEDeE0dW41CgJKUNl8';
 
+/// This class is responsible for making network requests. which encapsulates
+/// HTTP request functionality. It provides a generic method for making GET
+/// requests and handling responses.
 class Network {
-
   /// This reduces code duplication and centralizes error handling.
   Future<T> makeRequest<T>(
     Uri uri,

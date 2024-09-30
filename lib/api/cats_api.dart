@@ -20,7 +20,7 @@ class CatAPI {
     try {
       final breeds = await network.makeRequest<List<Breed>>(
         uri,
-            (json) => BreedList.fromJson(json).breeds,
+        (json) => BreedList.fromJson(json).breeds,
       );
       return Result<List<Breed>>.success(breeds);
     } catch (error) {
@@ -34,7 +34,7 @@ class CatAPI {
     try {
       final breeds = await network.makeRequest<List<CatBreed>>(
         uri,
-            (json) => CatList.fromJson(json).breeds,
+        (json) => CatList.fromJson(json).breeds,
       );
       if (breeds.isEmpty) {
         throw Exception('No breed found with the given ID');
