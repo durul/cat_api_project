@@ -13,8 +13,6 @@ class CatImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('Cat image URL: ${imageUrl}');
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [

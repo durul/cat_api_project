@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../components/cat_breed_card.dart';
 import '../model/cats.dart';
 import '../provider/cat_data_provider.dart';
 import 'cat_info.dart';
@@ -79,42 +80,14 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
           return ListView.builder(
             itemCount: catDataProvider.breeds.length,
             itemBuilder: (context, index) {
-              return _buildBreedCard(catDataProvider.breeds[index]);
+              return BreedCard(
+                breed: catDataProvider.breeds[index],
+                onTap: _navigateToCatInfo,
+              );
             },
           );
         }
       },
-    );
-  }
-
-  Widget _buildBreedCard(Breed breed) {
-    return Semantics(
-      label: 'Cat breed: ${breed.name}',
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: InkWell(
-          onTap: () => _navigateToCatInfo(breed),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  breed.name,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  breed.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 
