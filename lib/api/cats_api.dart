@@ -15,6 +15,7 @@ class CatAPI {
 
   CatAPI({Network? network}) : network = network ?? Network();
 
+  /// Fetches a list of cat breeds from the API.
   Future<CatResponse> getCatBreeds() async {
     final uri = Uri.parse('$_baseUrl$_breedsEndpoint');
     try {
@@ -28,6 +29,7 @@ class CatAPI {
     }
   }
 
+  /// Fetches a specific cat breed from the API.
   Future<CatDetailsResponse> getCatBreed(String breedId) async {
     final uri = Uri.parse('$_baseUrl$_imagesEndpoint')
         .replace(queryParameters: {'breed_id': breedId});
