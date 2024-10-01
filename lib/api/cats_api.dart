@@ -15,11 +15,15 @@ class CatAPI {
   CatAPI({Network? network}) : network = network ?? Network();
 
   /// Fetches a list of cat breeds from the API.
-  Future<CatResponse> getCatBreeds() async {
+  Future<CatResponse> getCatBreeds({int page = 1, int limit = 10}) async {
     try {
       final breeds = await network.makeRequest<List<Breed>>(
         _breedsEndpoint,
         (json) => BreedList.fromJson(json).breeds,
+        queryParameters: {
+          'page': page.toString(),
+          'limit': limit.toString(),
+        },
       );
 
       return Result<List<Breed>>.success(breeds);

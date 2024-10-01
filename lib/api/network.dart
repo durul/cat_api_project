@@ -45,7 +45,7 @@ class Network {
       );
 
       if (response.statusCode == 200) {
-        final json = response.data; // Directly using Dio's response data
+        final json = response.data;
         return parseJson(json);
       } else {
         throw Exception('Failed to load data: ${response.statusCode}');
