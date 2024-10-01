@@ -1,9 +1,6 @@
-// filename: cat_info.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../api/cats_api.dart';
 import '../components/cat_image_widget.dart';
 import '../model/cats.dart';
 import '../provider/cat_data_provider.dart';
@@ -20,20 +17,26 @@ class CatInfo extends StatefulWidget {
 
 class _CatInfoState extends State<CatInfo> {
   @override
+  void initState() {
+    super.initState();
+
+    // Use addPostFrameCallback to ensure the code runs after the first frame (build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final catDataProvider =
+          Provider.of<CatDataProvider>(context, listen: false);
+      catDataProvider.getCatSpecificData(widget.catId);
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) =>
-          CatDataProvider(catAPI: CatAPI())..getCatSpecificData(widget.catId),
-      child: Consumer<CatDataProvider>(
-        builder: (context, catDataProvider, child) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(widget.catBreed),
-            ),
-            body: _buildCatContent(catDataProvider),
-          );
-        },
+    final catDataProvider = Provider.of<CatDataProvider>(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.catBreed),
       ),
+      body: _buildCatContent(catDataProvider),
     );
   }
 

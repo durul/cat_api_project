@@ -21,16 +21,23 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
   @override
   void initState() {
     super.initState();
-    final catDataProvider =
-        Provider.of<CatDataProvider>(context, listen: false);
-    catDataProvider.getCatData();
 
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels ==
-              _scrollController.position.maxScrollExtent &&
-          !catDataProvider.isLoading) {
-        catDataProvider.getCatData(isLoadMore: true);
-      }
+    // Use addPostFrameCallback to ensure the code runs after the first frame (build)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final catDataProvider =
+          Provider.of<CatDataProvider>(context, listen: false);
+      catDataProvider.getCatData(); // Fetch cat data initially
+
+      // Listen for list scrolling to fetch more data
+      _scrollController.addListener(() {
+        if (_scrollController.position.pixels ==
+                _scrollController.position.maxScrollExtent &&
+            !catDataProvider.isLoading) {
+          catDataProvider.getCatData(
+              isLoadMore:
+                  true); // Load more cat data when the user scrolls to the bottom
+        }
+      });
     });
   }
 

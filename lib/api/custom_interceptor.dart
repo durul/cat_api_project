@@ -1,4 +1,4 @@
-import 'package:cat_api_project/api/timeout_exception.dart';
+import 'timeout_exception.dart';
 import 'package:dio/dio.dart';
 
 class CustomInterceptor extends Interceptor {
