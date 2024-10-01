@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../api/cats_api.dart';
 import '../components/cat_breed_card.dart';
 import '../model/cats.dart';
+import '../provider/cat_data_provider.dart';
 import 'cat_info.dart';
 
 class CatBreedsPage extends StatefulWidget {
@@ -16,63 +17,21 @@ class CatBreedsPage extends StatefulWidget {
 
 class _CatBreedsPageState extends State<CatBreedsPage> {
   final ScrollController _scrollController = ScrollController();
-  bool _isLoadingMore = false;
-  List<Breed> breeds = [];
-  int currentPage = 0;
-  bool isLastPage = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchCatBreeds();
+    final catDataProvider =
+        Provider.of<CatDataProvider>(context, listen: false);
+    catDataProvider.getCatData();
 
-    // Listen to scroll changes
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
               _scrollController.position.maxScrollExtent &&
-          !_isLoadingMore &&
-          !isLastPage) {
-        _loadMoreBreeds();
+          !catDataProvider.isLoading) {
+        catDataProvider.getCatData(isLoadMore: true);
       }
     });
-  }
-
-  Future<void> _fetchCatBreeds({bool isLoadMore = false}) async {
-    setState(() {
-      _isLoadingMore = true;
-    });
-
-    try {
-      final catResponse = await CatAPI().getCatBreeds(page: currentPage);
-      if (catResponse.isSuccess && catResponse.data != null) {
-        final newBreeds = catResponse.data!;
-        if (newBreeds.isEmpty) {
-          isLastPage = true;
-        }
-        setState(() {
-          if (isLoadMore) {
-            breeds.addAll(newBreeds);
-          } else {
-            breeds = newBreeds;
-          }
-          currentPage++;
-        });
-      } else {
-        throw Exception(catResponse.error ?? 'An unknown error occurred');
-      }
-    } catch (e) {
-      print('Error fetching cat breeds: $e');
-    } finally {
-      setState(() {
-        _isLoadingMore = false;
-      });
-    }
-  }
-
-  Future<void> _loadMoreBreeds() async {
-    if (!_isLoadingMore) {
-      await _fetchCatBreeds(isLoadMore: true);
-    }
   }
 
   @override
@@ -80,33 +39,60 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: RefreshIndicator(
-        onRefresh: () => _fetchCatBreeds(),
-        child: breeds.isEmpty && _isLoadingMore
-            ? const Center(child: CircularProgressIndicator())
-            : ListView.builder(
+        onRefresh: () =>
+            Provider.of<CatDataProvider>(context, listen: false).reloadBreeds(),
+        child: Consumer<CatDataProvider>(
+          builder: (context, catDataProvider, child) {
+            if (catDataProvider.isLoading && catDataProvider.breeds.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (catDataProvider.errorMessage != null) {
+              return _buildErrorMessage(catDataProvider);
+            } else {
+              return ListView.builder(
                 controller: _scrollController,
-                itemCount: isLastPage ? breeds.length : breeds.length + 1,
+                itemCount: catDataProvider.isLastPage
+                    ? catDataProvider.breeds.length
+                    : catDataProvider.breeds.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == breeds.length) {
-                    // This builds the loading indicator at the end of the list
+                  if (index == catDataProvider.breeds.length) {
+                    // The loading indicator is shown at the end when more data is being fetched
                     return const Padding(
                       padding: EdgeInsets.all(8.0),
                       child: Center(child: CircularProgressIndicator()),
                     );
                   } else {
                     return BreedCard(
-                      breed: breeds[index],
+                      breed: catDataProvider.breeds[index],
                       onTap: _navigateToCatInfo,
                     );
                   }
                 },
-              ),
+              );
+            }
+          },
+        ),
       ),
     );
   }
 
-  // Add your navigation to the breed details screen etc.
+  Widget _buildErrorMessage(CatDataProvider provider) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(provider.errorMessage!,
+              style: const TextStyle(color: Colors.red)),
+          const SizedBox(height: 25),
+          ElevatedButton(
+            onPressed: provider.reloadBreeds,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
 
+  // Define your navigation logic here
   void _navigateToCatInfo(Breed breed) {
     Navigator.push<void>(
       context,

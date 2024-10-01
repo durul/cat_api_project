@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import '../api/cats_api.dart';
 import '../model/cats.dart';
@@ -8,27 +8,54 @@ class CatDataProvider extends ChangeNotifier {
   List<Breed> breeds = [];
   String? errorMessage;
   bool isLoading = false;
+  bool isLoadMoreLoading = false;
+  bool isLastPage = false;
+  int currentPage = 0;
+  final int limit = 10; // Number of items per page
   CatBreed? catBreed;
 
   CatDataProvider({required this.catAPI});
 
-  Future<void> getCatData() async {
-    isLoading = true;
-    errorMessage = null;
-    notifyListeners();
+  Future<void> getCatData({bool isLoadMore = false}) async {
+    if (isLoadMore && isLastPage) return;
 
     try {
-      final catResponse = await catAPI.getCatBreeds();
-      if (catResponse.isSuccess && catResponse.data != null) {
-        breeds = catResponse.data ?? [];
+      // Loading state management
+      if (isLoadMore) {
+        isLoadMoreLoading = true;
       } else {
-        throw Exception(catResponse.error ?? 'An unknown error occurred');
+        isLoading = true;
+      }
+
+      notifyListeners();
+
+      final catResponse =
+          await catAPI.getCatBreeds(page: currentPage, limit: limit);
+      if (catResponse.isSuccess && catResponse.data != null) {
+        final newBreeds = catResponse.data ?? [];
+        if (newBreeds.isEmpty) {
+          isLastPage = true;
+        }
+
+        if (isLoadMore) {
+          breeds.addAll(newBreeds);
+        } else {
+          breeds = newBreeds;
+        }
+
+        currentPage++;
+      } else {
+        errorMessage = catResponse.error ?? 'An unknown error occurred';
       }
     } catch (e) {
       errorMessage = e.toString();
       print('Error fetching cat breeds: $errorMessage');
     } finally {
-      isLoading = false;
+      if (isLoadMore) {
+        isLoadMoreLoading = false;
+      } else {
+        isLoading = false;
+      }
       notifyListeners();
     }
   }
@@ -53,5 +80,13 @@ class CatDataProvider extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<void> reloadBreeds() async {
+    // Reset the pagination data for a fresh load
+    currentPage = 1;
+    isLastPage = false;
+    breeds.clear();
+    await getCatData();
   }
 }
