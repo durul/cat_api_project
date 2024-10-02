@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'api/cats_api.dart';
@@ -9,8 +10,10 @@ import 'screens/cat_breeds.dart';
 
 Future<void> main({bool testing = false}) async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
 
-  Network().init();
+  final network = Network();
+  await network.init();
 
   runApp(const MyApp());
 }
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final catAPI = CatAPI(dio: Network().provideDio());
+    final catAPI = CatAPI(dio: Network().dio);
     return ChangeNotifierProvider(
       create: (_) => CatDataProvider(catAPI: catAPI),
       child: MaterialApp(
