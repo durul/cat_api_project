@@ -8,6 +8,7 @@ import 'api/network.dart';
 import 'provider/cat_data_provider.dart';
 import 'screens/cat_breeds.dart';
 
+// Runs inside the main isolate
 Future<void> main({bool testing = false}) async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
