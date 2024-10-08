@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../model/cats.dart';
 import '../network/model_response.dart';
-import 'network.dart';
+import '../macros/class_modifier.dart';
 
 const String _breedsEndpoint = '/breeds';
 const String _imagesEndpoint = '/images/search';
@@ -10,13 +10,10 @@ const String _imagesEndpoint = '/images/search';
 typedef CatResponse = Result<List<Breed>>;
 typedef CatDetailsResponse = Result<CatBreed>;
 
+@FlutterBaseMacro()
 /// This class is responsible for making requests to the Cat API.
 class CatAPI {
   final Dio dio;
-
-  CatAPI({
-    required this.dio,
-  });
 
   /// Fetches a list of cat breeds from the API.
   Future<CatResponse> getCatBreeds({int page = 1, int limit = 10}) async {

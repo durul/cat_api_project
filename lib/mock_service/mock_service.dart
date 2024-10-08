@@ -6,8 +6,8 @@ import '../model/cats.dart';
 
 class MockService {
   Future loadCats() async {
-    var jsonString = await rootBundle.loadString('assets/cats.json');
-    var catsResults = BreedList.fromJson(jsonDecode(jsonString));
+    final jsonString = await rootBundle.loadString('assets/cats.json');
+    final catsResults = BreedList.fromJson(jsonDecode(jsonString));
 
     return catsResults;
   }

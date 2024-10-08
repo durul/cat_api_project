@@ -40,7 +40,7 @@ class BreedList {
 
   // This is the fromJson method
   // I need to parse the JSON array to a list of breeds.
-  factory BreedList.fromJson(dynamic json) {
+  factory BreedList.fromJson(json) {
     if (json is List) {
       return BreedList(
         breeds:
@@ -98,7 +98,7 @@ class CatList {
 
   CatList({required this.breeds});
 
-  factory CatList.fromJson(dynamic json) {
+  factory CatList.fromJson(json) {
     if (json is List) {
       return CatList(
         breeds: json
