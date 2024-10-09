@@ -1,5 +1,6 @@
-import 'timeout_exception.dart';
 import 'package:dio/dio.dart';
+
+import 'timeout_exception.dart';
 
 class CustomInterceptor extends Interceptor {
   @override

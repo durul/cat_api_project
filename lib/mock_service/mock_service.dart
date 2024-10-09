@@ -2,13 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart' show rootBundle;
 
+import '../api/cats_api.dart';
 import '../model/cats.dart';
+import '../network/model_response.dart';
 
 class MockService {
-  Future loadCats() async {
+  Future<CatResponse> mockGetCatBreeds({int page = 1, int limit = 10}) async {
     final jsonString = await rootBundle.loadString('assets/cats.json');
     final catsResults = BreedList.fromJson(jsonDecode(jsonString));
 
-    return catsResults;
+    return Result<List<Breed>>.success(catsResults.breeds);
   }
 }

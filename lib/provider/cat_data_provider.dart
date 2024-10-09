@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../api/cats_api.dart';
+import '../mock_service/mock_service.dart';
 import '../model/cats.dart';
 
 class CatDataProvider extends ChangeNotifier {
   final CatAPI catAPI;
+  final MockService mockService = MockService();
   List<Breed> breeds = [];
   String? errorMessage;
   bool isLoading = false;
@@ -31,8 +33,12 @@ class CatDataProvider extends ChangeNotifier {
 
       final catResponse =
           await catAPI.getCatBreeds(page: currentPage, limit: limit);
-      if (catResponse.isSuccess && catResponse.data != null) {
-        final newBreeds = catResponse.data ?? [];
+
+      final mockCatResponse =
+          await mockService.mockGetCatBreeds(page: currentPage, limit: limit);
+
+      if (mockCatResponse.isSuccess && mockCatResponse.data != null) {
+        final newBreeds = mockCatResponse.data ?? [];
         if (newBreeds.isEmpty) {
           isLastPage = true;
         }
