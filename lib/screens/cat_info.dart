@@ -20,7 +20,7 @@ class _CatInfoState extends State<CatInfo> {
   void initState() {
     super.initState();
 
-    // Use addPostFrameCallback to ensure the code runs after the first frame (build)
+    // AddPostFrameCallback to ensure the code runs after the first frame (build)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final catDataProvider =
           Provider.of<CatDataProvider>(context, listen: false);
@@ -83,17 +83,19 @@ class _CatInfoState extends State<CatInfo> {
 
   Widget _buildCatDetails(CatBreed catBreed) {
     return SingleChildScrollView(
-      child: Card(
-        margin: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            _buildCatImage(catBreed),
-            const SizedBox(height: 10),
-            Text('Height: ${catBreed.height ?? 'Unknown'}'),
-            const SizedBox(height: 10),
-            Text('Width: ${catBreed.width ?? 'Unknown'}'),
-            const SizedBox(height: 10),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Card(
+          child: Column(
+            children: [
+              _buildCatImage(catBreed),
+              const SizedBox(height: 10),
+              Text('Height: ${catBreed.height ?? 'Unknown'}'),
+              const SizedBox(height: 10),
+              Text('Width: ${catBreed.width ?? 'Unknown'}'),
+              const SizedBox(height: 10),
+            ],
+          ),
         ),
       ),
     );
