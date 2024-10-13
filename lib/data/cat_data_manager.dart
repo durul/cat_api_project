@@ -4,7 +4,7 @@ import '../api/cats_api.dart';
 import '../mock_service/mock_service.dart';
 import '../model/cats.dart';
 
-class CatDataProvider extends ChangeNotifier {
+class CatDataManager extends ChangeNotifier {
   final CatAPI catAPI;
   final MockService mockService = MockService();
   List<Breed> breeds = [];
@@ -16,7 +16,7 @@ class CatDataProvider extends ChangeNotifier {
   final int limit = 10; // Number of items per page
   CatBreed? catBreed;
 
-  CatDataProvider({required this.catAPI});
+  CatDataManager({required this.catAPI});
 
   Future<void> getCatData({bool isLoadMore = false}) async {
     if (isLoadMore && isLastPage) return;
@@ -37,8 +37,8 @@ class CatDataProvider extends ChangeNotifier {
       final mockCatResponse =
           await mockService.mockGetCatBreeds(page: currentPage, limit: limit);
 
-      if (mockCatResponse.isSuccess && mockCatResponse.data != null) {
-        final newBreeds = mockCatResponse.data ?? [];
+      if (catResponse.isSuccess && catResponse.data != null) {
+        final newBreeds = catResponse.data ?? [];
         if (newBreeds.isEmpty) {
           isLastPage = true;
         }

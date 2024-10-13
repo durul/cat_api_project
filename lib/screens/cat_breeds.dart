@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../components/cat_breed_card.dart';
 import '../model/cats.dart';
-import '../provider/cat_data_provider.dart';
+import '../data/cat_data_manager.dart';
 import 'cat_info.dart';
 
 class CatBreedsPage extends StatefulWidget {
@@ -25,7 +25,7 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
     // Use addPostFrameCallback to ensure the code runs after the first frame (build)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final catDataProvider =
-          Provider.of<CatDataProvider>(context, listen: false);
+          Provider.of<CatDataManager>(context, listen: false);
       catDataProvider.getCatData(); // Fetch cat data initially
 
       // Listen for list scrolling to fetch more data
@@ -47,8 +47,8 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
       appBar: AppBar(title: Text(widget.title)),
       body: RefreshIndicator(
         onRefresh: () =>
-            Provider.of<CatDataProvider>(context, listen: false).reloadBreeds(),
-        child: Consumer<CatDataProvider>(
+            Provider.of<CatDataManager>(context, listen: false).reloadBreeds(),
+        child: Consumer<CatDataManager>(
           builder: (context, catDataProvider, child) {
             if (catDataProvider.isLoading && catDataProvider.breeds.isEmpty) {
               return const Center(child: CircularProgressIndicator());
@@ -82,7 +82,7 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
     );
   }
 
-  Widget _buildErrorMessage(CatDataProvider provider) {
+  Widget _buildErrorMessage(CatDataManager provider) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

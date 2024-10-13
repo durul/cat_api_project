@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'api/cats_api.dart';
 import 'api/network.dart';
-import 'provider/cat_data_provider.dart';
+import 'data/cat_data_manager.dart';
 import 'screens/cat_breeds.dart';
 
 // Runs inside the main isolate
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final catAPI = CatAPI(dio: Network().dio);
     return ChangeNotifierProvider(
-      create: (_) => CatDataProvider(catAPI: catAPI),
+      create: (_) => CatDataManager(catAPI: catAPI),
       child: MaterialApp(
         title: 'Cats',
         theme: ThemeData(

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../components/cat_image_widget.dart';
+import '../data/cat_data_manager.dart';
 import '../model/cats.dart';
-import '../provider/cat_data_provider.dart';
 
 class CatInfo extends StatefulWidget {
   final String catBreed;
@@ -23,14 +23,14 @@ class _CatInfoState extends State<CatInfo> {
     // AddPostFrameCallback to ensure the code runs after the first frame (build)
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final catDataProvider =
-          Provider.of<CatDataProvider>(context, listen: false);
+          Provider.of<CatDataManager>(context, listen: false);
       catDataProvider.getCatSpecificData(widget.catId);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final catDataProvider = Provider.of<CatDataProvider>(context);
+    final catDataProvider = Provider.of<CatDataManager>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -40,7 +40,7 @@ class _CatInfoState extends State<CatInfo> {
     );
   }
 
-  Widget _buildCatContent(CatDataProvider catDataProvider) {
+  Widget _buildCatContent(CatDataManager catDataProvider) {
     if (catDataProvider.isLoading) {
       return _buildLoadingIndicator();
     } else if (catDataProvider.errorMessage != null) {
@@ -65,7 +65,7 @@ class _CatInfoState extends State<CatInfo> {
     );
   }
 
-  Widget _buildErrorMessage(CatDataProvider catDataProvider) {
+  Widget _buildErrorMessage(CatDataManager catDataProvider) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
