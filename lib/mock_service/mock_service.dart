@@ -7,7 +7,7 @@ import '../model/cats.dart';
 import '../network/model_response.dart';
 
 class MockService {
-  Future<CatResponse> mockGetCatBreeds({int page = 1, int limit = 10}) async {
+  Future<CatResponse> mockGetCatBreeds({int page = 0, int limit = 10}) async {
     final jsonString = await rootBundle.loadString('assets/cats.json');
     final catsResults = BreedList.fromJson(jsonDecode(jsonString));
 

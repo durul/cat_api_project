@@ -18,7 +18,7 @@ class CatAPI {
   });
 
   /// Fetches a list of cat breeds from the API.
-  Future<CatResponse> getCatBreeds({int page = 1, int limit = 10}) async {
+  Future<CatResponse> getCatBreeds({int page = 0, int limit = 10}) async {
     try {
       final breeds = await makeRequest<List<Breed>>(
         _breedsEndpoint,

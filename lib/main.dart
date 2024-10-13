@@ -1,14 +1,14 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import 'api/cats_api.dart';
 import 'api/network.dart';
 import 'data/cat_data_manager.dart';
-import 'screens/cat_breeds.dart';
+import 'my_app.dart';
+import 'network/network_info.dart';
 
-// Runs inside the main isolate
 Future<void> main({bool testing = false}) async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
@@ -16,29 +16,23 @@ Future<void> main({bool testing = false}) async {
   final network = Network();
   await network.init();
 
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final catAPI = CatAPI(dio: Network().dio);
-    return ChangeNotifierProvider(
-      create: (_) => CatDataManager(catAPI: catAPI),
-      child: MaterialApp(
-        title: 'Cats',
-        theme: ThemeData(
-          primarySwatch: Colors.orange,
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.orange,
-            foregroundColor: Colors.white,
-            systemOverlayStyle: SystemUiOverlayStyle.light,
-          ),
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<NetworkInfo>(
+          create: (_) => NetworkInfo(Connectivity()),
         ),
-        home: const CatBreedsPage(title: 'Cat Breeds'),
-      ),
-    );
-  }
+        ChangeNotifierProvider<CatDataManager>(
+          create: (context) {
+            final networkInfo = context.read<NetworkInfo>();
+            return CatDataManager(
+              catAPI: CatAPI(dio: network.dio),
+              networkInfo: networkInfo,
+            );
+          },
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../api/cats_api.dart';
 import '../mock_service/mock_service.dart';
 import '../model/cats.dart';
+import '../network/network_info.dart';
 
 class CatDataManager extends ChangeNotifier {
   final CatAPI catAPI;
@@ -16,7 +17,19 @@ class CatDataManager extends ChangeNotifier {
   final int limit = 10; // Number of items per page
   CatBreed? catBreed;
 
-  CatDataManager({required this.catAPI});
+  // we read the NetworkInfo from the context and pass it to the CatDataManager.
+  final NetworkInfo networkInfo;
+
+  CatDataManager({required this.catAPI, required this.networkInfo}) {
+    networkInfo.addListener(_onNetworkChanged);
+  }
+
+  void _onNetworkChanged() {
+    if (networkInfo.isConnected && breeds.isEmpty) {
+      getCatData();
+    }
+    notifyListeners();
+  }
 
   Future<void> getCatData({bool isLoadMore = false}) async {
     if (isLoadMore && isLastPage) return;
@@ -90,9 +103,15 @@ class CatDataManager extends ChangeNotifier {
 
   Future<void> reloadBreeds() async {
     // Reset the pagination data for a fresh load
-    currentPage = 1;
+    currentPage = 0;
     isLastPage = false;
     breeds.clear();
     await getCatData();
+  }
+
+  @override
+  void dispose() {
+    networkInfo.removeListener(_onNetworkChanged);
+    super.dispose();
   }
 }
