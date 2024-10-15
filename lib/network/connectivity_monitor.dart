@@ -1,19 +1,22 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 // NetworkInfo class to check the network status and
 // notify listeners when the status changes.
 
 // This class uses the Connectivity plugin to check the network status.
 // It extends ChangeNotifier to notify listeners when the network status changes.
-class NetworkInfo extends ChangeNotifier {
+class ConnectivityMonitor extends ChangeNotifier {
   final Connectivity connectivity;
 
   // Private property to store the network status
   bool _isConnected = false;
 
   // Constructor to initialize the Connectivity status in the constructor
-  NetworkInfo(this.connectivity);
+  ConnectivityMonitor(this.connectivity);
 
   bool get isConnected => _isConnected; // Synchronous getter
 
@@ -28,10 +31,29 @@ class NetworkInfo extends ChangeNotifier {
         _isConnected = newIsConnected;
         notifyListeners();
       }
+    } on PlatformException catch (e) {
+      // Handle platform-specific exceptions
+      print('Platform exception checking connectivity: $e');
+      if (e.code == 'no_network') {
+        // Set _isConnected to false if no network is available
+        _isConnected = false;
+        notifyListeners();
+      } else {
+        // Handle other platform exceptions
+        print('Unknown platform exception checking connectivity: $e');
+      }
+    } on SocketException catch (e) {
+      // Handle socket exceptions
+      print('Socket exception checking connectivity: $e');
+      // Set _isConnected to false if socket exception occurs
+      _isConnected = false;
+      notifyListeners();
     } catch (e) {
-      print('Error checking connectivity: $e');
-      // Handle the error appropriately, e.g., set _isConnected to false and
-      // notify listeners if needed
+      // Handle any other unexpected exceptions
+      print('Unexpected exception checking connectivity: $e');
+      // Set _isConnected to false and notify listeners
+      _isConnected = false;
+      notifyListeners();
     }
   }
 

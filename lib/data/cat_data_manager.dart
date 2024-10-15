@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../api/cats_api.dart';
 import '../mock_service/mock_service.dart';
 import '../model/cats.dart';
-import '../network/network_info.dart';
+import '../network/connectivity_monitor.dart';
 
 class CatDataManager extends ChangeNotifier {
   final CatAPI catAPI;
@@ -18,7 +18,7 @@ class CatDataManager extends ChangeNotifier {
   CatBreed? catBreed;
 
   // we read the NetworkInfo from the context and pass it to the CatDataManager.
-  final NetworkInfo networkInfo;
+  final ConnectivityMonitor networkInfo;
 
   CatDataManager({required this.catAPI, required this.networkInfo}) {
     networkInfo.addListener(_onNetworkChanged);

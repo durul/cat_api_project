@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'network/network_info.dart';
+import 'network/connectivity_monitor.dart';
 import 'network/screens/no_internet_screen.dart';
 import 'screens/cat_breeds.dart';
 
@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final networkInfo = context.watch<NetworkInfo>();
+    final networkInfo = context.watch<ConnectivityMonitor>();
 
     return MaterialApp(
       title: 'Cats',

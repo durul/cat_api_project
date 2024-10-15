@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 import '../model/cats.dart';
 import '../network/model_response.dart';
+import 'api_exception.dart';
+import 'network.dart';
 
 const String _breedsEndpoint = '/breeds';
 const String _imagesEndpoint = '/images/search';
@@ -11,10 +15,10 @@ typedef CatDetailsResponse = Result<CatBreed>;
 
 /// This class is responsible for making requests to the Cat API.
 class CatAPI {
-  final Dio dio;
+  final Network network;
 
   CatAPI({
-    required this.dio,
+    required this.network,
   });
 
   /// Fetches a list of cat breeds from the API.
@@ -61,7 +65,7 @@ class CatAPI {
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
-      final response = await dio.get(
+      final response = await network.dio.get(
         endpoint,
         queryParameters: queryParameters,
       );
@@ -70,10 +74,47 @@ class CatAPI {
         final json = response.data;
         return parseJson(json);
       } else {
-        throw Exception('Failed to load data: ${response.statusCode}');
+        throw ApiException(
+          message: 'Request failed',
+          statusCode: response.statusCode,
+          data: response.data,
+        );
       }
     } on DioException catch (e) {
-      throw Exception('Error occurred: ${e.message}');
+      switch (e.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.sendTimeout:
+        case DioExceptionType.receiveTimeout:
+          throw ApiException(
+              message: 'Connection timeout',
+              statusCode: e.response?.statusCode);
+        case DioExceptionType.badResponse:
+          throw ApiException(
+            message: 'Bad response',
+            statusCode: e.response?.statusCode,
+            data: e.response?.data,
+          );
+        case DioExceptionType.cancel:
+          throw ApiException(
+              message: 'Request cancelled', statusCode: e.response?.statusCode);
+        case DioExceptionType.unknown:
+          // Internet connectivity check: Specifically catches
+          // SocketException for no internet scenarios.
+          if (e.error is SocketException) {
+            throw ApiException(
+                message: 'No internet connection',
+                statusCode: e.response?.statusCode);
+          }
+          throw ApiException(
+              message: 'Unexpected error occurred',
+              statusCode: e.response?.statusCode);
+        default:
+          throw ApiException(
+              message: 'Error occurred: ${e.message}',
+              statusCode: e.response?.statusCode);
+      }
+    } catch (e) {
+      throw ApiException(message: 'Unexpected error: $e');
     }
   }
 }

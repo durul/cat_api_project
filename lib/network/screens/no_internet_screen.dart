@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import '../network_info.dart'; // Assuming this imports your NetworkInfo
+import '../connectivity_monitor.dart'; // Assuming this imports your NetworkInfo
 
 class NoInternetScreen extends StatelessWidget {
   const NoInternetScreen({super.key});
@@ -37,7 +37,7 @@ class NoInternetScreen extends StatelessWidget {
   }
 
   Future<void> _checkConnectivity(BuildContext context) async {
-    final networkInfo = context.read<NetworkInfo>();
+    final networkInfo = context.read<ConnectivityMonitor>();
     final isConnected = networkInfo.isConnected; // Use the getter
 
     if (isConnected) {

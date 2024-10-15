@@ -7,7 +7,7 @@ import 'api/cats_api.dart';
 import 'api/network.dart';
 import 'data/cat_data_manager.dart';
 import 'my_app.dart';
-import 'network/network_info.dart';
+import 'network/connectivity_monitor.dart';
 
 Future<void> main({bool testing = false}) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,14 +19,14 @@ Future<void> main({bool testing = false}) async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<NetworkInfo>(
-          create: (_) => NetworkInfo(Connectivity()),
+        ChangeNotifierProvider<ConnectivityMonitor>(
+          create: (_) => ConnectivityMonitor(Connectivity()),
         ),
         ChangeNotifierProvider<CatDataManager>(
           create: (context) {
-            final networkInfo = context.read<NetworkInfo>();
+            final networkInfo = context.read<ConnectivityMonitor>();
             return CatDataManager(
-              catAPI: CatAPI(dio: network.dio),
+              catAPI: CatAPI(network: network),
               networkInfo: networkInfo,
             );
           },

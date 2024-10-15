@@ -17,6 +17,8 @@ class Network {
     _dio = _createDio();
   }
 
+  Dio get dio => _dio;
+
   factory Network() {
     return _instance;
   }
@@ -36,8 +38,6 @@ class Network {
     return Dio(baseOptions);
   }
 
-  Dio get dio => _dio;
-
   Future<void> init() async {
     await dotenv.load();
     final apiKey = dotenv.env['API_KEY'];
@@ -45,7 +45,8 @@ class Network {
       _dio.options.headers[Endpoint.headerKey] = apiKey;
     }
 
-    final isDevMode = dotenv.get('DEVELOPMENTMODE', fallback: '').toLowerCase() == 'true';
+    final isDevMode =
+        dotenv.get('DEVELOPMENTMODE', fallback: '').toLowerCase() == 'true';
 
     if (isDevMode) {
       print('Development mode enabled.');
