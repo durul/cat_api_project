@@ -7,5 +7,7 @@ class ApiException implements Exception {
   ApiException({required this.message, this.statusCode, this.data});
 
   @override
-  String toString() => 'ApiException: $message (Status Code: $statusCode)';
+  String toString() =>
+      'ApiException: $message (Status Code: ${statusCode ?? "Unknown"})';
 }
+

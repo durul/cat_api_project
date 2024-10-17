@@ -64,11 +64,11 @@ class CatDataManager extends ChangeNotifier {
 
         currentPage++;
       } else {
-        errorMessage = catResponse.error ?? 'An unknown error occurred';
+        errorMessage =
+            catResponse.statusCode.toString() ?? 'An unknown error occurred';
       }
     } catch (e) {
       errorMessage = e.toString();
-      print('Error fetching cat breeds: $errorMessage');
     } finally {
       if (isLoadMore) {
         isLoadMoreLoading = false;
@@ -90,11 +90,10 @@ class CatDataManager extends ChangeNotifier {
       if (catBreedResponse.isSuccess && catBreedResponse.data != null) {
         catBreed = catBreedResponse.data;
       } else {
-        throw Exception(catBreedResponse.error ?? 'An unknown error occurred');
+        errorMessage = catBreedResponse.error ?? 'An unknown error occurred';
       }
     } catch (e) {
       errorMessage = e.toString();
-      print('Error fetching cat breed: $errorMessage');
     } finally {
       isLoading = false;
       notifyListeners();

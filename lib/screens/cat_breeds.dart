@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../components/cat_breed_card.dart';
-import '../model/cats.dart';
 import '../data/cat_data_manager.dart';
+import '../model/cats.dart';
 import 'cat_info.dart';
 
 class CatBreedsPage extends StatefulWidget {

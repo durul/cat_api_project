@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
+import 'api/api_helper.dart';
 import 'api/cats_api.dart';
 import 'api/network.dart';
 import 'data/cat_data_manager.dart';
@@ -26,7 +27,8 @@ Future<void> main({bool testing = false}) async {
           create: (context) {
             final networkInfo = context.read<ConnectivityMonitor>();
             return CatDataManager(
-              catAPI: CatAPI(network: network),
+              catAPI: CatAPI(
+                  apiHelper: ApiHelper(dio: network.dio, network: network)),
               networkInfo: networkInfo,
             );
           },

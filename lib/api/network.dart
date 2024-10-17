@@ -3,7 +3,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-import 'custom_interceptor.dart';
 import 'endpoint.dart';
 
 /// This class is responsible for making network requests,
@@ -67,7 +66,6 @@ class Network {
 
     _dio.interceptors.addAll([
       prettyDioLogger,
-      CustomInterceptor(),
       CurlLoggerDioInterceptor(),
     ]);
   }

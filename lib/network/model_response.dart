@@ -2,12 +2,13 @@
 class Result<T> {
   final T? data;
   final String? error;
+  final int? statusCode;
 
-  Result.success(this.data) : error = null;
+  Result.success(this.data)
+      : error = null,
+        statusCode = null;
 
-  Result.failure(this.error) : data = null;
+  Result.failure(this.error, [this.statusCode]) : data = null;
 
-  bool get isSuccess => error == null;
-
-  bool get isFailure => error != null;
+  bool get isSuccess => data != null;
 }
