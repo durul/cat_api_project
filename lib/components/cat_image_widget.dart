@@ -5,27 +5,28 @@ class CatImage extends StatelessWidget {
   final String imageUrl;
   final String breed;
 
-  const CatImage({
-    super.key,
-    required this.imageUrl,
-    required this.breed,
-  });
+  const CatImage({super.key, required this.imageUrl, required this.breed});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        CachedNetworkImage(
-          imageUrl: imageUrl,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => const CircularProgressIndicator(),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
+        Semantics(
+          label: 'Image of $breed cat',
+          image: true,
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
+          ),
         ),
-        const SizedBox(height: 16),
-        Text(
-          breed,
-          style: Theme.of(context).textTheme.titleLarge,
+        const SizedBox(height: 8),
+        Semantics(
+          label: 'Breed name',
+          child: Text(
+            breed,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
         ),
       ],
     );
