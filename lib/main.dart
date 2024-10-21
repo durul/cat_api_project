@@ -17,6 +17,7 @@ Future<void> main({bool testing = false}) async {
   final network = Network();
   await network.init();
 
+  // Uses the Provider package to set up dependency injection for the app.
   runApp(
     MultiProvider(
       providers: [

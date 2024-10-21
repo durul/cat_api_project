@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../components/cat_breed_card.dart';
+import '../components/error_message_widget.dart';
 import '../data/cat_data_manager.dart';
 import '../model/cats.dart';
 import 'cat_info.dart';
@@ -53,7 +54,8 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
             if (catDataProvider.isLoading && catDataProvider.breeds.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             } else if (catDataProvider.errorMessage != null) {
-              return _buildErrorMessage(catDataProvider);
+              return ErrorMessageWidget(
+                  context: context, provider: catDataProvider);
             } else {
               return ListView.builder(
                 controller: _scrollController,
@@ -78,23 +80,6 @@ class _CatBreedsPageState extends State<CatBreedsPage> {
             }
           },
         ),
-      ),
-    );
-  }
-
-  Widget _buildErrorMessage(CatDataManager provider) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(provider.errorMessage!,
-              style: const TextStyle(color: Colors.red)),
-          const SizedBox(height: 25),
-          ElevatedButton(
-            onPressed: provider.reloadBreeds,
-            child: const Text('Retry'),
-          ),
-        ],
       ),
     );
   }
