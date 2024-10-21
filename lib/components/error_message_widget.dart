@@ -24,12 +24,15 @@ class ErrorMessageWidget extends StatelessWidget {
             size: 60,
           ),
           const SizedBox(height: 16),
-          Text(
-            provider.errorMessage ?? 'An unknown error occurred',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(color: Colors.red),
+          Semantics(
+            label: 'Error description',
+            child: Text(
+              provider.errorMessage ?? 'An unknown error occurred',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.red),
+            ),
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
