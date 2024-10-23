@@ -10,4 +10,3 @@ class ApiException implements Exception {
   String toString() =>
       'ApiException: $message (Status Code: ${statusCode ?? "Unknown"})';
 }
-
